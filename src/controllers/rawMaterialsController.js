@@ -3,7 +3,7 @@ const pool = require('../config/db');
 // GET /raw-materials
 async function listRawMaterials(req, res) {
   try {
-    const companyId = 'PT_A'; 
+    const companyId = 'PT_A';
 
     const result = await pool.query(
       `SELECT * FROM raw_materials
@@ -23,8 +23,8 @@ async function listRawMaterials(req, res) {
 async function createRawMaterial(req, res) {
   try {
     const { name, unit, attributes } = req.body;
-    const companyId = 'PT_A'; 
- 
+    const companyId = 'PT_A';
+
     if (!name || typeof name !== 'string') {
       return res.status(400).json({ message: 'Field "name" wajib diisi dan harus berupa teks' });
     }
@@ -34,15 +34,14 @@ async function createRawMaterial(req, res) {
     if (attributes !== undefined && (typeof attributes !== 'object' || Array.isArray(attributes))) {
       return res.status(400).json({ message: 'Field "attributes" harus berupa objek JSON' });
     }
- 
+
     const result = await pool.query(
       `INSERT INTO raw_materials (company_id, name, unit, attributes)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [companyId, name, unit, attributes || {}]
     );
- 
-   
+
     res.status(201).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ message: 'Terjadi kesalahan di server', error: err.message });
@@ -55,7 +54,7 @@ async function updateRawMaterial(req, res) {
     const { id } = req.params;
     const { name, unit, attributes } = req.body;
     const companyId = 'PT_A';
- 
+
     if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
       return res.status(400).json({ message: 'Field "name" harus berupa teks dan tidak boleh kosong' });
     }
@@ -65,7 +64,7 @@ async function updateRawMaterial(req, res) {
     if (attributes !== undefined && (typeof attributes !== 'object' || Array.isArray(attributes))) {
       return res.status(400).json({ message: 'Field "attributes" harus berupa objek JSON' });
     }
- 
+
     const result = await pool.query(
       `UPDATE raw_materials
        SET name = COALESCE($1, name),
@@ -77,11 +76,11 @@ async function updateRawMaterial(req, res) {
        RETURNING *`,
       [name ?? null, unit ?? null, attributes ?? null, id, companyId]
     );
- 
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Produk tidak ditemukan' });
+      return res.status(404).json({ message: 'Raw material tidak ditemukan' });
     }
- 
+
     res.status(200).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ message: 'Terjadi kesalahan di server', error: err.message });
@@ -92,8 +91,8 @@ async function updateRawMaterial(req, res) {
 async function softDeleteRawMaterial(req, res) {
   try {
     const { id } = req.params;
-    const companyId = 'PT_A'; 
- 
+    const companyId = 'PT_A';
+
     const result = await pool.query(
       `UPDATE raw_materials
        SET deleted_at = NOW()
@@ -103,15 +102,15 @@ async function softDeleteRawMaterial(req, res) {
        RETURNING id`,
       [id, companyId]
     );
- 
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Produk tidak ditemukan' });
+      return res.status(404).json({ message: 'Raw material tidak ditemukan' });
     }
- 
+
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ message: 'Terjadi kesalahan di server', error: err.message });
   }
 }
- 
+
 module.exports = { listRawMaterials, createRawMaterial, updateRawMaterial, softDeleteRawMaterial };
