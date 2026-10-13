@@ -3,10 +3,12 @@ const pool = require('./config/db');
 const productsRoutes = require('./routes/productsRoutes');
 const rawMaterialsRoutes = require('./routes/rawMaterialsRoutes');
 const batchesRoutes = require('./routes/batchesRoutes');
+const authRoutes = require('./routes/authRoutes');
 const app = express();
 
 app.use(express.json());
 
+app.use('/auth', authRoutes);
 app.use('/products', productsRoutes);
 app.use('/raw-materials', rawMaterialsRoutes);
 app.use('/batches', batchesRoutes);

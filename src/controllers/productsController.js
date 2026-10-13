@@ -3,14 +3,14 @@ const pool = require('../config/db');
 // GET /products
 async function listProducts(req, res) {
   try {
-    const companyId = 'PT_A';
+    const companyIds = req.user.company_ids;
 
     const result = await pool.query(
       `SELECT * FROM products
-       WHERE company_id = $1
+       WHERE company_id = ANY($1)
          AND deleted_at IS NULL
        ORDER BY id ASC`,
-      [companyId]
+      [companyIds]
     );
 
     res.status(200).json(result.rows);
